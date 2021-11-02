@@ -1,222 +1,124 @@
-CREATE DATABASE  IF NOT EXISTS `SpotifyClone` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `SpotifyClone`;
--- MySQL dump 10.13  Distrib 8.0.26, for Linux (x86_64)
---
--- Host: localhost    Database: SpotifyClone
--- ------------------------------------------------------
--- Server version	8.0.26
+CREATE DATABASE IF NOT EXISTS SpotifyClone;
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+USE SpotifyClone;
 
---
--- Table structure for table `albuns`
---
+CREATE TABLE planos (
+plano_id INT PRIMARY KEY AUTO_INCREMENT,
+plano VARCHAR(50) NOT NULL,
+disponivel INT NOT NULL,
+valor_plano FLOAT NOT NULL
+) engine = InnoDB;
 
-DROP TABLE IF EXISTS `albuns`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `albuns` (
-  `album_id` int NOT NULL AUTO_INCREMENT,
-  `nome` varchar(60) NOT NULL,
-  `artista_id` int DEFAULT NULL,
-  PRIMARY KEY (`album_id`),
-  KEY `artista_id` (`artista_id`),
-  CONSTRAINT `albuns_ibfk_1` FOREIGN KEY (`artista_id`) REFERENCES `artistas` (`artista_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+CREATE TABLE users (
+user_id INT PRIMARY KEY AUTO_INCREMENT,
+name VARCHAR(50) NOT NULL,
+idade INT NOT NULL,
+plano_id INT NOT NULL,
+FOREIGN KEY(plano_id) REFERENCES planos (plano_id)
+) engine = InnoDB;
 
---
--- Dumping data for table `albuns`
---
+CREATE TABLE artistas (
+artista_id INT PRIMARY KEY AUTO_INCREMENT,
+name_artista VARCHAR(50) NOT NULL
+);
 
-LOCK TABLES `albuns` WRITE;
-/*!40000 ALTER TABLE `albuns` DISABLE KEYS */;
-INSERT INTO `albuns` VALUES (1,'Envious',1),(2,'Exuberant',1),(3,'Hallowed Steam',2),(4,'Incandescent',3),(5,'Temporary Culture',4);
-/*!40000 ALTER TABLE `albuns` ENABLE KEYS */;
-UNLOCK TABLES;
+CREATE TABLE albuns (
+album_id INT PRIMARY KEY AUTO_INCREMENT,
+nome_album VARCHAR(50) NOT NULL,
+artista_id INT NOT NULL,
+FOREIGN KEY (artista_id) REFERENCES artistas (artista_id)
+);
 
---
--- Table structure for table `artistas`
---
+CREATE TABLE cancoes (
+cancoes_id INT PRIMARY KEY AUTO_INCREMENT,
+nome_cancao VARCHAR(50) NOT NULL,
+album_id INT NOT NULL,
+FOREIGN KEY (album_id) REFERENCES albuns (album_id)
+) engine = InnoDB;
 
-DROP TABLE IF EXISTS `artistas`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `artistas` (
-  `artista_id` int NOT NULL AUTO_INCREMENT,
-  `nome` varchar(60) NOT NULL,
-  PRIMARY KEY (`artista_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+CREATE TABLE historico (
+user_id INT NOT NULL,
+cancoes_id INT NOT NULL,
+FOREIGN KEY (cancoes_id) REFERENCES cancoes (cancoes_id),
+FOREIGN KEY (user_id) REFERENCES users (user_id),
+CONSTRAINT PRIMARY KEY (cancoes_id, user_id)
+) engine = InnoDB;
 
---
--- Dumping data for table `artistas`
---
+CREATE TABLE seguidores (
+user_id INT NOT NULL,
+artista_id INT NOT NULL,
+FOREIGN KEY (user_id) REFERENCES users (user_id),
+FOREIGN KEY (artista_id) REFERENCES artistas (artista_id),
+CONSTRAINT PRIMARY KEY (artista_id, user_id)
+) engine = InnoDB;
 
-LOCK TABLES `artistas` WRITE;
-/*!40000 ALTER TABLE `artistas` DISABLE KEYS */;
-INSERT INTO `artistas` VALUES (1,'Walter Phoenix'),(2,'Peter Strong'),(3,'Lance Day'),(4,'Freedie Shannon');
-/*!40000 ALTER TABLE `artistas` ENABLE KEYS */;
-UNLOCK TABLES;
 
---
--- Table structure for table `historico`
---
+INSERT INTO planos (plano, disponivel, valor_plano) VALUES
+('gratuito', 1, 0),
+('familiar', 1, 7.99),
+('universitário', 1, 5.99);
 
-DROP TABLE IF EXISTS `historico`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `historico` (
-  `usuario_id` int NOT NULL,
-  `musica_id` int NOT NULL,
-  PRIMARY KEY (`usuario_id`,`musica_id`),
-  KEY `musica_id` (`musica_id`),
-  CONSTRAINT `historico_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`usuario_id`),
-  CONSTRAINT `historico_ibfk_2` FOREIGN KEY (`musica_id`) REFERENCES `musicas` (`musica_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+INSERT INTO users (name, idade, plano_id)VALUES
+('Thati', 23, 1),
+('Cintia', 35, 2),
+('Bill', 20, 3),
+('Roger', 45, 1);
 
---
--- Dumping data for table `historico`
---
+INSERT INTO artistas (name_artista)VALUES
+('Walter Phoenix'),
+('Peter Strong'),
+('Lance Day'),
+('Freedie Shannon');
 
-LOCK TABLES `historico` WRITE;
-/*!40000 ALTER TABLE `historico` DISABLE KEYS */;
-INSERT INTO `historico` VALUES (1,1),(2,2),(4,3),(3,4),(1,6),(3,6),(4,11),(2,13),(1,14),(2,15),(1,16),(3,16),(2,17),(4,18);
-/*!40000 ALTER TABLE `historico` ENABLE KEYS */;
-UNLOCK TABLES;
+INSERT INTO seguidores (user_id, artista_id)VALUES
+(1, 1),
+(1, 4),
+(1, 3),
+(2, 1),
+(2, 3),
+(3, 2),
+(3, 1),
+(4, 4);
 
---
--- Table structure for table `musicas`
---
+INSERT INTO albuns (nome_album, artista_id)VALUES
+('Envious', 1),
+('Exuberant', 1),
+('Hallowed Steam', 2),
+('Incandescent', 3),
+('Temporary Culture', 4);
 
-DROP TABLE IF EXISTS `musicas`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `musicas` (
-  `musica_id` int NOT NULL AUTO_INCREMENT,
-  `nome` varchar(60) NOT NULL,
-  `album_id` int NOT NULL,
-  PRIMARY KEY (`musica_id`),
-  KEY `album_id` (`album_id`),
-  CONSTRAINT `musicas_ibfk_1` FOREIGN KEY (`album_id`) REFERENCES `albuns` (`album_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+INSERT INTO cancoes (nome_cancao, album_id)VALUES
+('Soul For Us', 1),
+('Reflections Of Magic', 1),
+('Dance With Her Own', 1),
+('Troubles Of My Inner Fire', 2),
+('Time Fireworks', 2),
+('Magic Circus', 3),
+('Honey, So Do I', 3),
+("Sweetie, Let's Go Wild", 3),
+('She Knows', 3),
+('Fantasy For Me', 4),
+('Celebration Of More', 4),
+('Rock His Everything', 4),
+('Home Forever', 4),
+('Diamond Power', 4),
+("Honey, Let's Be Silly", 4),
+('Thang Of Thunder', 5),
+('Words Of Her Life', 5),
+('Without My Streets', 5);
 
---
--- Dumping data for table `musicas`
---
-
-LOCK TABLES `musicas` WRITE;
-/*!40000 ALTER TABLE `musicas` DISABLE KEYS */;
-INSERT INTO `musicas` VALUES (1,'Soul For Us',1),(2,'Reflections Of Magic',1),(3,'Dance With Her Own',1),(4,'Troubles Of My Inner Fire',2),(5,'Time Fireworks',2),(6,'Magic Circus',3),(7,'Honey, So Do I',3),(8,'Sweetie, Let\'s Go Wild',3),(9,'She Knows',3),(10,'Fantasy For Me',4),(11,'Celebration Of More',4),(12,'Rock His Everything',4),(13,'Home Forever',4),(14,'Diamond Power',4),(15,'Honey, Let\'s Be Silly',4),(16,'Thang Of Thunder',5),(17,'Words Of Her Life',5),(18,'Without My Streets',5);
-/*!40000 ALTER TABLE `musicas` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `planos`
---
-
-DROP TABLE IF EXISTS `planos`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `planos` (
-  `plano_id` int NOT NULL AUTO_INCREMENT,
-  `nome` varchar(60) NOT NULL,
-  `valor` float DEFAULT (0),
-  PRIMARY KEY (`plano_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `planos`
---
-
-LOCK TABLES `planos` WRITE;
-/*!40000 ALTER TABLE `planos` DISABLE KEYS */;
-INSERT INTO `planos` VALUES (1,'gratuito',0),(2,'familiar',7.99),(3,'universitário',5.99);
-/*!40000 ALTER TABLE `planos` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `seguindo`
---
-
-DROP TABLE IF EXISTS `seguindo`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `seguindo` (
-  `usuario_id` int NOT NULL,
-  `artista_id` int NOT NULL,
-  PRIMARY KEY (`usuario_id`,`artista_id`),
-  KEY `artista_id` (`artista_id`),
-  CONSTRAINT `seguindo_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`usuario_id`),
-  CONSTRAINT `seguindo_ibfk_2` FOREIGN KEY (`artista_id`) REFERENCES `artistas` (`artista_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `seguindo`
---
-
-LOCK TABLES `seguindo` WRITE;
-/*!40000 ALTER TABLE `seguindo` DISABLE KEYS */;
-INSERT INTO `seguindo` VALUES (1,1),(2,1),(3,1),(3,2),(1,3),(2,3),(1,4),(4,4);
-/*!40000 ALTER TABLE `seguindo` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `usuarios`
---
-
-DROP TABLE IF EXISTS `usuarios`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `usuarios` (
-  `usuario_id` int NOT NULL AUTO_INCREMENT,
-  `nome` varchar(60) NOT NULL,
-  `idade` int NOT NULL,
-  `plano_id` int NOT NULL,
-  PRIMARY KEY (`usuario_id`),
-  KEY `plano_id` (`plano_id`),
-  CONSTRAINT `usuarios_ibfk_1` FOREIGN KEY (`plano_id`) REFERENCES `planos` (`plano_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `usuarios`
---
-
-LOCK TABLES `usuarios` WRITE;
-/*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
-INSERT INTO `usuarios` VALUES (1,'Thati',23,1),(2,'Cintia',35,2),(3,'Bill',20,3),(4,'Roger',45,1);
-/*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Dumping events for database 'SpotifyClone'
---
-
---
--- Dumping routines for database 'SpotifyClone'
---
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2021-10-29 17:21:17
+INSERT INTO historico (user_id, cancoes_id)VALUES
+(1, 1),
+(1, 6),
+(1, 14),
+(1, 16),
+(2, 13),
+(2, 17),
+(2, 2),
+(2, 15),
+(3, 4),
+(3, 16),
+(3, 6),
+(4, 3),
+(4, 18),
+(4, 11); 
